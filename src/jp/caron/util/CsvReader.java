@@ -56,7 +56,13 @@ public class CsvReader implements Closeable {
 	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> list(boolean isHeader, Class<? super T> clazz) throws InstantiationException, IllegalAccessException {
 
-		return new InnerIterable<T>(isHeader, (T) clazz.newInstance(), this.br);
+		return new InnerIterable<T>(isHeader, (T) clazz.newInstance(), this.br, InjectUtil.newPropertyListener());
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Iterable<T> list(boolean isHeader, Class<? super T> clazz, PropertyListener pl) throws InstantiationException, IllegalAccessException {
+
+		return new InnerIterable<T>(isHeader, (T) clazz.newInstance(), this.br, pl);
 	}
 
 	public Iterable<Map<String, Object>> list(boolean isHeader) {
@@ -78,11 +84,13 @@ public class CsvReader implements Closeable {
 		private BufferedReader br;
 		private boolean isHeader;
 		private int dummy;
-		public InnerIterable(boolean isHeader, T instance, BufferedReader br) {
+		private PropertyListener pl;
+		public InnerIterable(boolean isHeader, T instance, BufferedReader br, PropertyListener pl) {
 			this.isHeader = isHeader;
 			this.instance = instance;
 			this.br = br;
 			this.dummy = 0;
+			this.pl = pl;
 		}
 
 		@Override
@@ -97,14 +105,8 @@ public class CsvReader implements Closeable {
 
 				@Override
 				public T next() {
-					try {
-						InjectUtil.setProperty(instance, "val", dummy);
-						InjectUtil.setProperty(instance, "name", dummy + "PL");
-					} catch (NoSuchFieldException | SecurityException
-							| IllegalArgumentException | IllegalAccessException e) {
-						// TODO 自動生成された catch ブロック
-						e.printStackTrace();
-					}
+					pl.setProperty(instance, "val", dummy);
+					pl.setProperty(instance, "name", dummy + "PL");
 					return instance;
 				}
 			};

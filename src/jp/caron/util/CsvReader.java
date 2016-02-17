@@ -37,11 +37,11 @@ public class CsvReader implements Closeable {
 	/**
 	 * constructor
 	 * @param path
-	 * @param set
+	 * @param charSet
 	 * @throws IOException
 	 */
-	private CsvReader(File path, Charset set) throws IOException {
-		br = new BufferedReader(new InputStreamReader(new FileInputStream(path), set));
+	private CsvReader(File path, Charset charSet) throws IOException {
+		br = new BufferedReader(new InputStreamReader(new FileInputStream(path), charSet));
 	}
 
 	/**
@@ -56,13 +56,13 @@ public class CsvReader implements Closeable {
 	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> list(boolean isHeader, Class<? super T> clazz) throws InstantiationException, IllegalAccessException {
 
-		return new InnerIterable<T>(isHeader, (T) clazz.newInstance(), this.br, InjectUtil.newPropertyListener());
+		return new InnerIterable<T>(isHeader, clazz, this.br, InjectUtil.newPropertyListener());
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> list(boolean isHeader, Class<? super T> clazz, PropertyListener pl) throws InstantiationException, IllegalAccessException {
 
-		return new InnerIterable<T>(isHeader, (T) clazz.newInstance(), this.br, pl);
+		return new InnerIterable<T>(isHeader, clazz, this.br, pl);
 	}
 
 	public Iterable<Map<String, Object>> list(boolean isHeader) {
@@ -80,14 +80,14 @@ public class CsvReader implements Closeable {
 
 	public static class InnerIterable<T> implements Iterable<T> {
 
-		private T instance;
+		private Class<? super T> clazz;
 		private BufferedReader br;
 		private boolean isHeader;
 		private int dummy;
 		private PropertyListener pl;
-		public InnerIterable(boolean isHeader, T instance, BufferedReader br, PropertyListener pl) {
+		public InnerIterable(boolean isHeader, Class<? super T> clazz, BufferedReader br, PropertyListener pl) {
 			this.isHeader = isHeader;
-			this.instance = instance;
+			this.clazz = clazz;
 			this.br = br;
 			this.dummy = 0;
 			this.pl = pl;
@@ -105,8 +105,8 @@ public class CsvReader implements Closeable {
 
 				@Override
 				public T next() {
-					pl.setProperty(instance, "val", dummy);
-					pl.setProperty(instance, "name", dummy + "PL");
+					T instance = pl.news(clazz);
+					pl.call(instance, "setValNam", new ArgSet<Integer>(int.class, 3456 + dummy), new ArgSet<String>(String.class, "Hello World" + dummy));
 					return instance;
 				}
 			};

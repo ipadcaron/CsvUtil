@@ -25,16 +25,16 @@ public class Main2 {
 
 		Dto1 dto1 = new Dto1("OK");
 
-		System.out.println("getProp::" + pl.getProperty(dto1, "s"));
+		System.out.println("getProp::" + pl.prop(dto1, "s"));
 
-		pl.setProperty(dto1, "s", "PPP");
-		System.out.println("setProp('PPP') and getProp::" + pl.getProperty(dto1, "s"));
+		pl.prop(dto1, "s", "PPP");
+		System.out.println("setProp('PPP') and getProp::" + pl.prop(dto1, "s"));
 
-		System.out.println("invoke('getS') returns ::" + pl.invoke(dto1, "getS"));
+		System.out.println("invoke('getS') returns ::" + pl.call(dto1, "getS"));
 
-		pl.invoke(dto1, "setS", new ArgSet<String>(String.class, "OKNG"));
+		pl.call(dto1, "setS", new ArgSet<String>(String.class, "OKNG"));
 
-		System.out.println("invoke('getS') returns ::" + pl.invoke(dto1, "getS"));
+		System.out.println("invoke('getS') returns ::" + pl.call(dto1, "getS"));
 
 	}
 

@@ -1,8 +1,11 @@
 package jp.caron.util;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.function.Function;
 
 public class InjectUtil {
 
@@ -61,7 +64,36 @@ public class InjectUtil {
 		return InjectUtil.invoke(o, m.getName(), args);
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T newInstance(Class<? super T> clazz,int...dim) throws InstantiationException, IllegalAccessException {
+		if (dim.length > 0) {
+			Class<?> clz = clazz.getComponentType();
+			while (clz != null) {
+				Class<?> tmp = clz.getComponentType();
+				if (tmp == null) {
+					break;
+				}
+				clz = tmp;
+			}
+			if (clz != null) {
+				return (T) Array.newInstance(clz, dim);
+			} else {
+				return (T) Array.newInstance(clazz, dim);
+			}
+		} else {
+			return (T) clazz.newInstance();
+		}
+	}
 
+	private static Map<String, Function<Number, Number>> map;
+
+	public static void setWithTypeConvert(Object o, String name, Object val) {
+		if (val != null) {
+			map.get(val.getClass().getName());
+			// TODO:
+			// TODO: ちょっとこれじゃダメだ。。。。
+		}
+	}
 
 	/**
 	 * プロパティ設定。取得、メソッド実行、結果取得　定義
@@ -71,7 +103,7 @@ public class InjectUtil {
 		return new PropertyListener() {
 
 			@Override
-			public Object getProperty(Object o, String name) {
+			public Object prop(Object o, String name) {
 				try {
 					return InjectUtil.getProperty(o, name);
 				} catch (Throwable t) {
@@ -80,7 +112,7 @@ public class InjectUtil {
 			}
 
 			@Override
-			public Object getProperty(Object o, Field field) {
+			public Object prop(Object o, Field field) {
 				try {
 					return InjectUtil.getProperty(o, field);
 				} catch (Throwable t) {
@@ -89,7 +121,7 @@ public class InjectUtil {
 			}
 
 			@Override
-			public void setProperty(Object o, String name, Object val) {
+			public void prop(Object o, String name, Object val) {
 				try {
 					InjectUtil.setProperty(o, name, val);
 				} catch (Throwable t) {
@@ -98,7 +130,7 @@ public class InjectUtil {
 			}
 
 			@Override
-			public void setProperty(Object o, Field field, Object val) {
+			public void prop(Object o, Field field, Object val) {
 				try {
 					InjectUtil.setProperty(o, field, val);
 				} catch (Throwable t) {
@@ -107,7 +139,7 @@ public class InjectUtil {
 			}
 
 			@Override
-			public Object invoke(Object o, String name, ArgSet<?>... args) {
+			public Object call(Object o, String name, ArgSet<?>... args) {
 				try {
 					return InjectUtil.invoke(o, name, args);
 				} catch (Throwable t) {
@@ -116,12 +148,22 @@ public class InjectUtil {
 			}
 
 			@Override
-			public Object invoke(Object o, Method method, ArgSet<?>... args) {
+			public Object call(Object o, Method method, ArgSet<?>... args) {
 				try {
 					return InjectUtil.invoke(o, method, args);
 				} catch (Throwable t) {
 					throw new RuntimeException("invoke method error 2", t);
 				}
-			}};
+			}
+
+			@Override
+			public <T> T news(Class<? super T> clazz, int...dim) {
+				try {
+					return InjectUtil.newInstance(clazz , dim);
+				} catch (Throwable t) {
+					throw new RuntimeException("new instance error ", t);
+				}
+			}
+		};
 	}
 }

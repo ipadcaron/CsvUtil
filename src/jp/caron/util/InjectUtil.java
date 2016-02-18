@@ -85,7 +85,7 @@ public class InjectUtil {
 		}
 	}
 
-	private static Map<String, Function<Number, Number>> map;
+	private static Map<Object, Object> map;
 
 	public static void setWithTypeConvert(Object o, String name, Object val) {
 		if (val != null) {

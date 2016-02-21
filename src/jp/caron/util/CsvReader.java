@@ -53,13 +53,11 @@ public class CsvReader implements Closeable {
 		this(path, Charset.forName("Shift_JIS"));
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> list(boolean isHeader, Class<? super T> clazz) throws InstantiationException, IllegalAccessException {
 
 		return new InnerIterable<T>(isHeader, clazz, this.br, InjectUtil.newPropertyListener());
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> Iterable<T> list(boolean isHeader, Class<? super T> clazz, PropertyListener pl) throws InstantiationException, IllegalAccessException {
 
 		return new InnerIterable<T>(isHeader, clazz, this.br, pl);

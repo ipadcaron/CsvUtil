@@ -108,23 +108,31 @@ public class TypeConverter {
 	}
 
 	/**
-	 * o を rType に変換する。o != null は上位で判定する。
+	 * o を rType に変換する。
 	 * assert 機能を有効にするには、コンパイルオプション -ea が必要らしい。
 	 * @param rType
 	 * @param o
 	 * @return
 	 */
 	public static Object to(Class<?> rType, Object o) {
-		assert o != null : "from operand requires not null.";
 
-		if (rType.equals(String.class)) {
-			if (o != null) {
-				return o.toString();
-			}
+		if (o == null) {
 			return null;
 		}
 
-		String si = rType.getName() + o.getClass().getName();
+		if (rType.equals(String.class)) {
+			return o.toString();
+		}
+
+		Class<?> clazz = pmap.get(rType);
+
+		String si;
+		if (clazz != null) {
+			si = clazz.getName() + o.getClass().getName();
+		} else {
+			si = rType.getName() + o.getClass().getName();
+		}
+
 		Function<Object, ?> fn = map.get(si);
 		if (fn != null) {
 			return fn.apply(o);
@@ -134,8 +142,21 @@ public class TypeConverter {
 	}
 
 	private static Map<String, Function<Object, ?>> map;
+	private static Map<Class<?>, Class<?>> pmap;
 	static {
 		map = new HashMap<>(120);
+		pmap = new HashMap<>();
+
+		// primitive to Class convert
+		pmap.put(byte.class, Byte.class);
+		pmap.put(char.class, Character.class);
+		pmap.put(short.class, Short.class);
+		pmap.put(int.class, Integer.class);
+		pmap.put(long.class, Long.class);
+		pmap.put(float.class, Float.class);
+		pmap.put(double.class, Double.class);
+		pmap.put(BigDecimal.class, BigDecimal.class);
+		pmap.put(BigInteger.class, BigInteger.class);
 
 		// Double to others
 		map.put(Double.class.getName() + BigDecimal.class.getName(), new Function<Object, Double>() {

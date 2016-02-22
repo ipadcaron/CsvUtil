@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.function.Function;
 
 public class InjectUtil {
 
@@ -89,11 +88,22 @@ public class InjectUtil {
 
 	public static void setWithTypeConvert(Object o, String name, Object val) {
 		if (val != null) {
-			map.get(val.getClass().getName());
 			// TODO:
-			// TODO: ちょっとこれじゃダメだ。。。。
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	public static <R> R copyBean(R bean) throws InstantiationException, IllegalAccessException, NoSuchFieldException, SecurityException, IllegalArgumentException {
+		R r = (R) bean.getClass().newInstance();
+
+		for (Field f : bean.getClass().getDeclaredFields()) {
+			Object val = InjectUtil.getProperty(bean, f);
+			InjectUtil.setProperty(r, f, val);
+		}
+
+		return r;
+	}
+	
 
 	/**
 	 * プロパティ設定。取得、メソッド実行、結果取得　定義

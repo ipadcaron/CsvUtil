@@ -84,6 +84,15 @@ public class InjectUtil {
 		}
 	}
 
+	public static <R> R createInstance(Class<R> clazz) throws InstantiationException, IllegalAccessException {
+		return clazz.newInstance();
+	}
+
+	public static <R> R from(R instance, Object o) {
+
+		return instance;
+	}
+
 	private static Map<Object, Object> map;
 
 	public static void setWithTypeConvert(Object o, String name, Object val) {
@@ -103,7 +112,7 @@ public class InjectUtil {
 
 		return r;
 	}
-	
+
 
 	/**
 	 * プロパティ設定。取得、メソッド実行、結果取得　定義
@@ -167,7 +176,7 @@ public class InjectUtil {
 			}
 
 			@Override
-			public <T> T news(Class<? super T> clazz, int...dim) {
+			public <T> T newArrayInstance(Class<? super T> clazz, int...dim) {
 				try {
 					return InjectUtil.newInstance(clazz , dim);
 				} catch (Throwable t) {

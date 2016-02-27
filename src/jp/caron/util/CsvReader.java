@@ -7,7 +7,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class CsvReader implements Closeable {
@@ -76,7 +78,7 @@ public class CsvReader implements Closeable {
 		}
 	}
 
-	public static class InnerIterable<T> implements Iterable<T> {
+	static class InnerIterable<T> implements Iterable<T> {
 
 		private Class<? super T> clazz;
 		private BufferedReader br;
@@ -103,11 +105,62 @@ public class CsvReader implements Closeable {
 
 				@Override
 				public T next() {
-					T instance = pl.news(clazz);
+					T instance = pl.newArrayInstance(clazz);
 					pl.call(instance, "setValNam", new ArgSet<Integer>(int.class, 3456 + dummy), new ArgSet<String>(String.class, "Hello World" + dummy));
 					return instance;
 				}
 			};
 		}
 	}
+
+	public static List<String> readLine(BufferedReader br, char delim) throws IOException {
+
+		List<String> list = new ArrayList<String>();
+
+		String line = null;
+		CharReader cr = new CharReader();
+		StringBuilder sb = new StringBuilder(1000);
+		boolean quote = false;
+
+		while ((line  = br.readLine()) != null) {
+
+			cr.reset(line);
+			
+			while (cr.hasNext()) {
+
+				char ch = cr.next();
+				
+				if (quote) {
+					if (ch == '"') {
+						if (cr.hasNext()) {
+							if (cr.next() == '"') {
+								sb.append('"');
+								continue;
+							} else {
+								cr.back();
+								quote = false;
+								list.add(sb.toString());
+								sb.setLength(0);
+								continue;
+							}
+						}
+					} else {
+						sb.append(ch);
+						continue;
+					}
+				}
+				
+				if (ch == '"') {
+					quote = true;
+					continue;
+				}
+			}
+			
+
+
+		}
+		return list;
+	}
+
+
 }

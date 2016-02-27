@@ -11,7 +11,7 @@ public interface PropertyListener {
 	 * @return
 	 */
 	Object prop(Object o, String name);
-	
+
 	/**
 	 * get property
 	 * @param o
@@ -19,7 +19,7 @@ public interface PropertyListener {
 	 * @return
 	 */
 	Object prop(Object o, Field field);
-	
+
 	/**
 	 * set property
 	 * @param o
@@ -27,7 +27,7 @@ public interface PropertyListener {
 	 * @param val
 	 */
 	void prop(Object o, String name, Object val);
-	
+
 	/**
 	 * set property
 	 * @param o
@@ -35,7 +35,7 @@ public interface PropertyListener {
 	 * @param val
 	 */
 	void prop(Object o, Field field, Object val);
-	
+
 	/**
 	 * invoke method
 	 * @param o
@@ -44,7 +44,7 @@ public interface PropertyListener {
 	 * @return
 	 */
 	Object call(Object o, String name, ArgSet<?>...args);
-	
+
 	/**
 	 * invoke method
 	 * @param o
@@ -60,7 +60,7 @@ public interface PropertyListener {
 	 * @param dim 配列の大きさ、... 並べて次元数
 	 * @return
 	 */
-	<T> T news(Class<? super T> clazz, int...dim);
+	<T> T newArrayInstance(Class<? super T> clazz, int...dim);
 
 	// primitive <=> primitive Class typed convert each other.
 	// list <=> array
